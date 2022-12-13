@@ -10,7 +10,7 @@ var register = async (firstName, lastName, email, password, next) => {
     if (checkUser) {
       const error = new Error("A user with above email already exists");
       error.statusCode = statusCode.UNAUTHORIZED;
-      console.log(error);
+      // console.log(error);
       return error;
     }
 
@@ -31,8 +31,34 @@ var register = async (firstName, lastName, email, password, next) => {
       error.statusCode = statusCode.INTERNAL_SERVER_ERROR;
       return error;
     }
-    // next(error);
+    // return next();
   }
 };
 
-module.exports = { register };
+var login = async (email, password, next) => {
+  try {
+    var checkUser = await User.findOne({ email });
+    if (!checkUser) {
+      const error = new Error("A user with this email cannot be found");
+      error.statusCode = statusCode.UNAUTHORIZED;
+      return error;
+    }
+    const isEqual = await bcrypt.compare(password, checkUser.password);
+
+    if (!isEqual) {
+      const error = new Error("Incorrect Password");
+      error.statusCode = statusCode.UNAUTHORIZED;
+      return error;
+    }
+
+    return checkUser;
+  } catch (error) {
+    if (!error.statusCode) {
+      error.statusCode = statusCode.INTERNAL_SERVER_ERROR;
+      return error;
+    }
+    // return next();
+  }
+};
+
+module.exports = { register, login };

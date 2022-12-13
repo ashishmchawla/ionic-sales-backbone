@@ -17,7 +17,7 @@ var register = async (req, res, next) => {
     } else {
       const error = new Error("Something went wrong!");
       error.statusCode = statusCode.UNAUTHORIZED;
-      return error;
+      throw error;
     }
   } catch (error) {
     if (!error.statusCode) {
@@ -27,4 +27,22 @@ var register = async (req, res, next) => {
   }
 };
 
-module.exports = { register };
+var login = async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    var user = await authRepo.login(email, password, next);
+    var token = await user.generateAuthToken(user);
+    var response = {
+      user: user.toJSON(user),
+      token,
+    };
+    return res.status(statusCode.SUCCESS).json(response);
+  } catch (error) {
+    if (!error.statusCode) {
+      error.statusCode = statusCode.INTERNAL_SERVER_ERROR;
+    }
+    next(error);
+  }
+};
+
+module.exports = { register, login };
