@@ -54,6 +54,7 @@ UserSchema.methods.toJSON = (user) => {
     "lastName",
     "email",
     "notifications",
+    "tokens",
   ]);
 };
 
