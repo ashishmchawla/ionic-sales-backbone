@@ -1,10 +1,10 @@
-const { User } = require("../models/User");
 const authRepo = require("../repositories/auth-repository");
 const { statusCode } = require("../config/constants");
 
 var register = async (req, res, next) => {
   try {
     const { firstName, lastName, email, password } = req.body;
+
     var result = await authRepo.register(firstName, lastName, email, password);
     if (result.statusCode === statusCode.SUCCESS) {
       var user = await authRepo.login(email, password, next);
